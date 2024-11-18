@@ -31,8 +31,8 @@ class ExcelDocxProcessorApp(App):
         layout.add_widget(process_excel_btn)
 
         # Input fields for docx filling (assuming two templates)
-        self.template_1_input = TextInput(hint_text='Template 1 info', size_hint=(1, None), height=40)
-        self.template_2_input = TextInput(hint_text='Template 2 info', size_hint=(1, None), height=40)
+        self.template_1_input = TextInput(hint_text='Template 1 info', size_hint=(1, None), height=40, multiline=False, )
+        self.template_2_input = TextInput(hint_text='Template 2 info', size_hint=(1, None), height=40, multiline=False)
         layout.add_widget(self.template_1_input)
         layout.add_widget(self.template_2_input)
 
@@ -48,7 +48,21 @@ class ExcelDocxProcessorApp(App):
         self.log_area.add_widget(self.log_box)
         layout.add_widget(self.log_area)
 
+        # Bind tab navigation to the Window
+        self.tab_order = [self.template_1_input, self.template_2_input]
+        Window.bind(on_key_down=self.on_key_down)
+
         return layout
+
+    def on_key_down(self, window, key, scancode, codepoint, modifier):
+        if key == 9:  # Tab key
+            focused_widget = next((widget for widget in self.tab_order if widget.focus), None)
+            if focused_widget:
+                current_index = self.tab_order.index(focused_widget)
+                next_index = (current_index + 1) % len(self.tab_order)
+                self.tab_order[next_index].focus = True
+                return True
+        return False
 
     def open_filechooser(self, instance):
         # Create a FileChooser popup
